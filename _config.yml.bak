@@ -79,7 +79,9 @@ theme: jacman
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
-  type:
+  type: git
+  repository: git@github.com:huashishaojie/huashishaojie.github.io.git
+  branch: master
 
 # Others
 index_generator:
