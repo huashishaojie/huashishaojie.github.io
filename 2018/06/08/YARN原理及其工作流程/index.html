@@ -4,24 +4,27 @@
 <head><meta name="generator" content="Hexo 3.8.0">
   <meta charset="UTF-8">
   
-    <title>About Me | Lei&#39;s Blog</title>
+    <title>YARN工作原理及其工作流程 | Lei&#39;s Blog</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="zhangleijie">
     
 
     
-    <meta name="description" content="Name CN: 张雷杰（ZhangLeijie） | EN: Leo I Am Apache Metron User。 全国高校大数据应用创新大赛全国一等奖2017 年进入凌云网络实验室大数据团队。以大数据技术为中心，涉猎颇广，知识面很广 Contact 微博: AngelBeats雷知乎: SilkGitHub: huashishaojieEmail: huashishaojie@gmail.">
-<meta property="og:type" content="website">
-<meta property="og:title" content="About Me">
-<meta property="og:url" content="https://huashishaojie.github.io/about/index.html">
+    <meta name="description" content="一 YARN组成元素及其功能RM:YARN的管理者NM:YARN的执行者 二 YARN工作原理首先数据上传到集群中.然后将写好的程序打成架包通过命令提交MR作业.提交到集群后由集群管理者MR开始调度分配资源.到HDFS读取数据执行MapReduce相关进程对数据进行计算 三 具体流程第一步: Client执行main()函数中runjob();开启作业 第二步:client向RM发送作业请求同时">
+<meta name="keywords" content="YARN,Hadoop">
+<meta property="og:type" content="article">
+<meta property="og:title" content="YARN工作原理及其工作流程">
+<meta property="og:url" content="https://huashishaojie.github.io/2018/06/08/YARN原理及其工作流程/index.html">
 <meta property="og:site_name" content="Lei&#39;s Blog">
-<meta property="og:description" content="Name CN: 张雷杰（ZhangLeijie） | EN: Leo I Am Apache Metron User。 全国高校大数据应用创新大赛全国一等奖2017 年进入凌云网络实验室大数据团队。以大数据技术为中心，涉猎颇广，知识面很广 Contact 微博: AngelBeats雷知乎: SilkGitHub: huashishaojieEmail: huashishaojie@gmail.">
+<meta property="og:description" content="一 YARN组成元素及其功能RM:YARN的管理者NM:YARN的执行者 二 YARN工作原理首先数据上传到集群中.然后将写好的程序打成架包通过命令提交MR作业.提交到集群后由集群管理者MR开始调度分配资源.到HDFS读取数据执行MapReduce相关进程对数据进行计算 三 具体流程第一步: Client执行main()函数中runjob();开启作业 第二步:client向RM发送作业请求同时">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-05-27T05:57:57.333Z">
+<meta property="og:image" content="https://huashishaojie.github.io/images/yarn.png">
+<meta property="og:updated_time" content="2019-06-11T12:44:15.308Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="About Me">
-<meta name="twitter:description" content="Name CN: 张雷杰（ZhangLeijie） | EN: Leo I Am Apache Metron User。 全国高校大数据应用创新大赛全国一等奖2017 年进入凌云网络实验室大数据团队。以大数据技术为中心，涉猎颇广，知识面很广 Contact 微博: AngelBeats雷知乎: SilkGitHub: huashishaojieEmail: huashishaojie@gmail.">
+<meta name="twitter:title" content="YARN工作原理及其工作流程">
+<meta name="twitter:description" content="一 YARN组成元素及其功能RM:YARN的管理者NM:YARN的执行者 二 YARN工作原理首先数据上传到集群中.然后将写好的程序打成架包通过命令提交MR作业.提交到集群后由集群管理者MR开始调度分配资源.到HDFS读取数据执行MapReduce相关进程对数据进行计算 三 具体流程第一步: Client执行main()函数中runjob();开启作业 第二步:client向RM发送作业请求同时">
+<meta name="twitter:image" content="https://huashishaojie.github.io/images/yarn.png">
 
     
     <link rel="alternative" href="/atom.xml" title="Lei&#39;s Blog" type="application/atom+xml">
@@ -86,37 +89,60 @@
 </div>
     </header>
     <div id="container">
-      <div id="main" class="about" itemscope itemprop="blogPost">
+      <div id="main" class="post" itemscope itemprop="blogPost">
   
 	<article itemprop="articleBody"> 
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/about/index.html" title="About Me" itemprop="url">About Me</a>
+      <a href="/2018/06/08/YARN原理及其工作流程/" title="YARN工作原理及其工作流程" itemprop="url">YARN工作原理及其工作流程</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="zhangleijie" target="_blank" itemprop="author">zhangleijie</a>
 		
   </p><p class="article-time">
-    <time datetime="2019-05-27T05:57:57.333Z" itemprop="datePublished"> 发表于 2019-05-27</time>
+    <time datetime="2018-06-08T06:24:58.000Z" itemprop="datePublished"> 发表于 2018-06-08</time>
     
   </p>
 </header>
 	<div class="article-content">
 		
-		<h1 id="Name"><a href="#Name" class="headerlink" title="Name"></a>Name</h1><hr>
-<p>CN: 张雷杰（ZhangLeijie） | EN: Leo</p>
-<h1 id="I-Am"><a href="#I-Am" class="headerlink" title="I Am"></a>I Am</h1><hr>
-<p>Apache Metron User。</p>
-<p>全国高校大数据应用创新大赛全国一等奖<br>2017 年进入凌云网络实验室大数据团队。<br>以大数据技术为中心，涉猎颇广，知识面很广</p>
-<h1 id="Contact"><a href="#Contact" class="headerlink" title="Contact"></a>Contact</h1><hr>
-<p>微博: <a href="https://weibo.com/zhangleijie1998" target="_blank" rel="noopener">AngelBeats雷</a><br>知乎: <a href="https://www.zhihu.com/people/zhangleijie1998" target="_blank" rel="noopener">Silk</a><br>GitHub: <a href="https://github.com/huashishaojie" target="_blank" rel="noopener">huashishaojie</a><br>Email: <a href="mailto:huashishaojie@gmail.com" target="_blank" rel="noopener">huashishaojie@gmail.com</a></p>
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#一-YARN组成元素及其功能"><span class="toc-number">1.</span> <span class="toc-text">一 YARN组成元素及其功能</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#二-YARN工作原理"><span class="toc-number">2.</span> <span class="toc-text">二 YARN工作原理</span></a></li></ol><li class="toc-item toc-level-2"><a class="toc-link" href="#三-具体流程"><span class="toc-number"></span> <span class="toc-text">三 具体流程</span></a>
+		
+		</li></div>
+		
+		<p><img src="/images/yarn.png" alt="YARN工作原理"></p>
+<h3 id="一-YARN组成元素及其功能"><a href="#一-YARN组成元素及其功能" class="headerlink" title="一 YARN组成元素及其功能"></a>一 YARN组成元素及其功能</h3><p>RM:YARN的管理者<br>NM:YARN的执行者</p>
+<h3 id="二-YARN工作原理"><a href="#二-YARN工作原理" class="headerlink" title="二 YARN工作原理"></a>二 YARN工作原理</h3><p>首先数据上传到集群中.然后将写好的程序打成架包通过命令提交MR作业.提交到集群后由集群管理者MR开始调度分配资源.到HDFS读取数据执行MapReduce相关进程对数据进行计算</p>
+<h2 id="三-具体流程"><a href="#三-具体流程" class="headerlink" title="三 具体流程"></a>三 具体流程</h2><p>第一步: Client执行main()函数中runjob();开启作业</p>
+<p>第二步:client向RM发送作业请求同时RM将作业id以及jar包存放路径返回给Client</p>
+<p>第三步:Client会把Jar路径为前缀作业id为后缀作为唯一存放路径,将jar包写入到HDFS集群中,默认情况下jar包写10份,而其他数据只写3份 当改程序运行完后删除这些数据</p>
+<p>第四步:Client再次将Jar存放地址(更为详细的描述)提交给RM.</p>
+<p>第五步:RM将其放入调度器,向NM发送命令,NM开启MRAPPMaster进程,MR根据HDFS中jar包数据量为NM分配任务.</p>
+<p>第六步:NM通过心跳机制接受调度器分配的任务</p>
+<p>第七步:NM会开启内部YARNChild </p>
+<p>第八步:YARNChild根据命令到HDFS检索作业资源,</p>
+<p>第九步:YARNChild开启MapTask 或者Reduce Task</p>
+<p>第十步:map计算YARNChild调度的数据.</p>
   
 	</div>
 		<footer class="article-footer clearfix">
 <div class="article-catetags">
 
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/YARN/">YARN</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/YARN/">YARN</a><a href="/tags/Hadoop/">Hadoop</a>
+  </div>
 
 </div>
 
@@ -124,7 +150,7 @@
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="https://huashishaojie.github.io/about/index.html" data-title="About Me | Lei&#39;s Blog" data-tsina class="share clearfix">
+	  <div data-url="https://huashishaojie.github.io/2018/06/08/YARN原理及其工作流程/" data-title="YARN工作原理及其工作流程 | Lei&#39;s Blog" data-tsina class="share clearfix">
 	  </div>
 	
 	</div>
@@ -135,12 +161,32 @@
    	       
 	</article>
 	
+<nav class="article-nav clearfix">
+ 
+
+<div class="next">
+<a href="/2018/06/03/使用hexo和git实现多地更新和配置博客源文件/" title="使用hexo和git实现多地更新和配置博客源文件">
+ <strong>下一篇：</strong><br> 
+ <span>使用hexo和git实现多地更新和配置博客源文件
+</span>
+</a>
+</div>
+
+</nav>
+
 	
 
 
 
 </div>  
       <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#一-YARN组成元素及其功能"><span class="toc-number">1.</span> <span class="toc-text">一 YARN组成元素及其功能</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#二-YARN工作原理"><span class="toc-number">2.</span> <span class="toc-text">二 YARN工作原理</span></a></li></ol><li class="toc-item toc-level-2"><a class="toc-link" href="#三-具体流程"><span class="toc-number"></span> <span class="toc-text">三 具体流程</span></a>
+ 
+  </li></div>
 
 <div id="asidepart">
 <div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
@@ -345,6 +391,11 @@ $(document).ready(function(){
     o.css("top",Math.max(80,260-$(this).scrollTop()));
   });
   
+        getSize();
+        if (myWidth >= 1024) {
+          c.click();
+        }
+  
   $(window).resize(function(){
     getSize(); 
     if (myWidth >= 1024) {
@@ -353,12 +404,89 @@ $(document).ready(function(){
       m.removeClass('moveMain');
       a.css('display', 'block').removeClass('fadeOut');
       o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
         
     }
   });
 });
 </script>
 
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
 
 
 
@@ -431,4 +559,4 @@ var _hmt = _hmt || [];
 <!-- Tiny_search End -->
 
   </body>
- </html>
+</html>
