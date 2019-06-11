@@ -111,7 +111,7 @@ google_analytics:
 ## https://developers.google.com/analytics/devguides/collection/upgrade/?hl=zh_CN
 baidu_tongji:
   enable: true
-  sitecode: e6d1f421bbc9962127a50488f9ed37d1 ## e.g. e6d1f421bbc9962127a50488f9ed37d1 your baidu tongji site code
+  sitecode: 1112a74651c536118adbab1136fa36c4 ## e.g. e6d1f421bbc9962127a50488f9ed37d1 your baidu tongji site code
 cnzz_tongji:
   enable: false
   siteid:    ## e.g. 1253575964 your cnzz tongji site id
@@ -144,3 +144,20 @@ tinysou_search:     ## http://tinysou.com/
 swift_search:     ## https://swiftype.com/
   enable: true
   id: quUthZd5kqn79c5URAe7
+
+# Valine.
+# You can get your appid and appkey from https://leancloud.cn
+# more info please open https://valine.js.org
+valine:
+  enable: true //false改为true
+  appid: 'y62dptMrL80wqg5xTI4MtbCz-gzGzoHsz', // 这里填写上面得到的APP ID
+  appkey: '5i8foy9MbxjiPRAgSwHiwAj8', // 这里填写上面得到的APP KEY
+  notify: false # mail notifier , https://github.com/xCss/Valine/wiki
+  verify: false # Verification code
+  placeholder: Just go go # comment box placeholder//留言框占位提示文字
+  avatar: mm # gravatar style
+  guest_info: nick,mail,link # custom comment header
+  pageSize: 10 # pagination size
+
+ leancloud_visitors:
+  enable: true
