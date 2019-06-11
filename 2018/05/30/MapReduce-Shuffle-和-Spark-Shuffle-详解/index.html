@@ -19,13 +19,13 @@
 <meta property="og:site_name" content="Lei&#39;s Blog">
 <meta property="og:description" content="Shuffle简介shuffle的本意是洗牌、混洗的意思，把一组有规则的数据尽量打乱成无规则的数据。而在MapReduce中，Shuffle更像是洗牌的逆过程，指的是将map端的无规则输出按指定的规则“打乱”成具有一定规则的数据，以便reduce端接收处理。其在MapReduce中所处的工作阶段是map输出后到reduce接收前，具体可以分为map端和reduce端前后两个部分。在shuffle之">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/20190528225053624.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjg0OTU3,size_16,color_FFFFFF,t_70">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/20190528224739384.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjg0OTU3,size_16,color_FFFFFF,t_70">
-<meta property="og:updated_time" content="2019-05-29T01:33:09.780Z">
+<meta property="og:image" content="https://huashishaojie.github.io/images/map_shuffle.jpg">
+<meta property="og:image" content="https://huashishaojie.github.io/images/reduce_shuffle.jpg">
+<meta property="og:updated_time" content="2019-06-11T13:03:41.842Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="MapReduce Shuffle 和 Spark Shuffle 详解">
 <meta name="twitter:description" content="Shuffle简介shuffle的本意是洗牌、混洗的意思，把一组有规则的数据尽量打乱成无规则的数据。而在MapReduce中，Shuffle更像是洗牌的逆过程，指的是将map端的无规则输出按指定的规则“打乱”成具有一定规则的数据，以便reduce端接收处理。其在MapReduce中所处的工作阶段是map输出后到reduce接收前，具体可以分为map端和reduce端前后两个部分。在shuffle之">
-<meta name="twitter:image" content="https://img-blog.csdnimg.cn/20190528225053624.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjg0OTU3,size_16,color_FFFFFF,t_70">
+<meta name="twitter:image" content="https://huashishaojie.github.io/images/map_shuffle.jpg">
 
     
     <link rel="alternative" href="/atom.xml" title="Lei&#39;s Blog" type="application/atom+xml">
@@ -117,8 +117,8 @@
 		</div>
 		
 		<h2 id="Shuffle简介"><a href="#Shuffle简介" class="headerlink" title="Shuffle简介"></a>Shuffle简介</h2><p>shuffle的本意是洗牌、混洗的意思，把一组有规则的数据尽量打乱成无规则的数据。而在MapReduce中，Shuffle更像是洗牌的逆过程，指的是将map端的无规则输出按指定的规则“打乱”成具有一定规则的数据，以便reduce端接收处理。其在MapReduce中所处的工作阶段是map输出后到reduce接收前，具体可以分为map端和reduce端前后两个部分。<br>在shuffle之前，也就是在map阶段，MapReduce会对要处理的数据进行分片（split）操作，为每一个分片分配一个MapTask任务。接下来map会对每一个分片中的每一行数据进行处理得到键值对（key,value）此时得到的键值对又叫做“中间结果”。此后便进入reduce阶段，由此可以看出Shuffle阶段的作用是处理“中间结果”。<br>由于Shuffle涉及到了磁盘的读写和网络的传输，因此Shuffle性能的高低直接影响到了整个程序的运行效率。</p>
-<h2 id="MapReduce-Shuffle"><a href="#MapReduce-Shuffle" class="headerlink" title="MapReduce Shuffle"></a>MapReduce Shuffle</h2><h3 id="Map端的shuffle"><a href="#Map端的shuffle" class="headerlink" title="Map端的shuffle"></a>Map端的shuffle</h3><p>下图是MapReduce Shuffle的官方流程：<br><img src="https://img-blog.csdnimg.cn/20190528225053624.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjg0OTU3,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br>因为频繁的磁盘I/O操作会严重的降低效率，因此“中间结果”不会立马写入磁盘，而是优先存储到map节点的“环形内存缓冲区”，在写入的过程中进行分区（partition），也就是对于每个键值对来说，都增加了一个partition属性值，然后连同键值对一起序列化成字节数组写入到缓冲区（缓冲区采用的就是字节数组，默认大小为100M）。<br>当写入的数据量达到预先设置的阙值后便会启动溢写出线程将缓冲区中的那部分数据溢出写（spill）到磁盘的临时文件中，并在写入前根据key进行排序（sort）和合并（combine，可选操作）。<br>溢出写过程按轮询方式将缓冲区中的内容写到mapreduce.cluster.local.dir属性指定的本地目录中。当整个map任务完成溢出写后，会对磁盘中这个map任务产生的所有临时文件（spill文件）进行归并（merge）操作生成最终的正式输出文件，此时的归并是将所有spill文件中的相同partition合并到一起，并对各个partition中的数据再进行一次排序（sort），生成key和对应的value-list，文件归并时，如果溢写文件数量超过参数min.num.spills.for.combine的值（默认为3）时，可以再次进行合并。<br>至此map端的工作已经全部结束，最终生成的文件也会存储在TaskTracker能够访问的位置。每个reduce task不间断的通过RPC从JobTracker那里获取map task是否完成的信息，如果得到的信息是map task已经完成，那么Shuffle的后半段开始启动。</p>
-<h3 id="Reduce端的shuffle"><a href="#Reduce端的shuffle" class="headerlink" title="Reduce端的shuffle"></a>Reduce端的shuffle</h3><p>当mapreduce任务提交后，reduce task就不断通过RPC从JobTracker那里获取map task是否完成的信息，如果获知某台TaskTracker上的map task执行完成，Shuffle的后半段过程就开始启动。Reduce端的shuffle主要包括三个阶段，copy、merge和reduce。<br>每个reduce task负责处理一个分区的文件，以下是reduce task的处理流程：<br><img src="https://img-blog.csdnimg.cn/20190528224739384.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjg0OTU3,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<h2 id="MapReduce-Shuffle"><a href="#MapReduce-Shuffle" class="headerlink" title="MapReduce Shuffle"></a>MapReduce Shuffle</h2><h3 id="Map端的shuffle"><a href="#Map端的shuffle" class="headerlink" title="Map端的shuffle"></a>Map端的shuffle</h3><p>下图是MapReduce Shuffle的官方流程：<br><img src="/images/map_shuffle.jpg" alt="Map端的Shuffle"><br>因为频繁的磁盘I/O操作会严重的降低效率，因此“中间结果”不会立马写入磁盘，而是优先存储到map节点的“环形内存缓冲区”，在写入的过程中进行分区（partition），也就是对于每个键值对来说，都增加了一个partition属性值，然后连同键值对一起序列化成字节数组写入到缓冲区（缓冲区采用的就是字节数组，默认大小为100M）。<br>当写入的数据量达到预先设置的阙值后便会启动溢写出线程将缓冲区中的那部分数据溢出写（spill）到磁盘的临时文件中，并在写入前根据key进行排序（sort）和合并（combine，可选操作）。<br>溢出写过程按轮询方式将缓冲区中的内容写到mapreduce.cluster.local.dir属性指定的本地目录中。当整个map任务完成溢出写后，会对磁盘中这个map任务产生的所有临时文件（spill文件）进行归并（merge）操作生成最终的正式输出文件，此时的归并是将所有spill文件中的相同partition合并到一起，并对各个partition中的数据再进行一次排序（sort），生成key和对应的value-list，文件归并时，如果溢写文件数量超过参数min.num.spills.for.combine的值（默认为3）时，可以再次进行合并。<br>至此map端的工作已经全部结束，最终生成的文件也会存储在TaskTracker能够访问的位置。每个reduce task不间断的通过RPC从JobTracker那里获取map task是否完成的信息，如果得到的信息是map task已经完成，那么Shuffle的后半段开始启动。</p>
+<h3 id="Reduce端的shuffle"><a href="#Reduce端的shuffle" class="headerlink" title="Reduce端的shuffle"></a>Reduce端的shuffle</h3><p>当mapreduce任务提交后，reduce task就不断通过RPC从JobTracker那里获取map task是否完成的信息，如果获知某台TaskTracker上的map task执行完成，Shuffle的后半段过程就开始启动。Reduce端的shuffle主要包括三个阶段，copy、merge和reduce。<br>每个reduce task负责处理一个分区的文件，以下是reduce task的处理流程：<br><img src="/images/reduce_shuffle.jpg" alt="Reduce端的shuffle"></p>
 <ul>
 <li>reduce task从每个map  task的结果文件中拉取对应分区的数据。因为数据在map阶段已经是分好区了，并且会有一个额外的索引文件记录每个分区的起始偏移量。所以reduce task取数的时候直接根据偏移量去拉取数据就ok。</li>
 <li>reduce task从每个map task拉取分区数据的时候会进行再次合并，排序，按照自定义的reducer的逻辑代码去处理。</li>
@@ -253,10 +253,6 @@
 			
 		
 			
-				<li><a href="/tags/YARN/" title="YARN">YARN<sup>1</sup></a></li>
-			
-		
-			
 				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>1</sup></a></li>
 			
 		
@@ -266,6 +262,10 @@
 		
 			
 				<li><a href="/tags/Hexo/" title="Hexo">Hexo<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/YARN/" title="YARN">YARN<sup>1</sup></a></li>
 			
 		
 			
