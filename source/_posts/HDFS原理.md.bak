@@ -25,10 +25,10 @@ HDFS采用的master/slave架构。一个HDFS集群通常由一个Active的NameNo
 当NameNode重启的时候，NameNode从FSImage和Edits文件中读取数据，加载到内存中。
 
 在HDFS体系来看，NameNode主要负责元数据的存储与操作，DataNode负责实际的存储。DataNode通常在一个机器上部署一个进程，这些机器分布式在多个机架上。整体架构如下图所示：
-![HDFS架构](/images/hdfs-architecture.png)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190528195642687.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjg0OTU3,size_16,color_FFFFFF,t_70)
 ## HDFS的读写流程
 ### 读流程分析
-![HDFS读流程](/images/hdfs_read.png)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/2019052819571334.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjg0OTU3,size_16,color_FFFFFF,t_70)
  - 客户端打开文件，通过rpc的方式向NameNode获取文件块的存储位置信息，NameNode会将文件中的各个块的所有副本DataNode全部返回，这些DataNode会按照与客户端的位置的距离排序。如果客户端就是在DataNode上，客户端可以直接从本地读取文件，跳过网络IO，性能更高。
  - 客户端调用read方法，存储了文件的前几个块的地址的DFSInputStream，就会连接存储了第一个块的最近的DataNode。然后通过DFSInputStream就通过重复调用read()方法，数据就从DataNode流动到客户端，当DataNode的最后一个块读取完成了，DFSInputSteam会关闭与DataNode的连接，然后寻找下一个快的最佳节点。这个过程读客户端来说透明的，在客户端那边来看们就像是只读取了一个连续不断的流。
  - 块是按顺序读的，通过 DFSInputStream 在 datanode 上打开新的连接去作为客户端读取的流。他也将会通过namenode
@@ -37,7 +37,7 @@ HDFS采用的master/slave架构。一个HDFS集群通常由一个Active的NameNo
 在这个设计中一个重要的方面就是客户端直接从 DataNode 上检索数据，并通过 NameNode 指导来得到每一个块的最佳    DataNode。这种设计允许 HDFS 扩展大量的并发客户端，因为数据传输只是集群上的所有 DataNode    展开的。期间，NameNode    仅仅只需要服务于获取块位置的请求（块位置信息是存放在内存中，所以效率很高）。如果不这样设计，随着客户端数据量的增长，数据服务就会很快成为一个瓶颈。 
 
 ### 写流程分析
-![HDFS写流程](/images/hdfs_write.png)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190528195754413.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjg0OTU3,size_16,color_FFFFFF,t_70)
  - 通过Client向远程的NameNode发送RPC请求；
  - 接收到请求后NameNode会首先判断对应的文件是否存在以及用户是否有对应的权限，成功则会为文件创建一个记录，否则会让客户端抛出异常；
  - 当客户端开始写入文件的时候，开发库会将文件切分成多个packets，并在内部以"data

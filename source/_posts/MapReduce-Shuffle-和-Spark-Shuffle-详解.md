@@ -14,7 +14,7 @@ shuffle的本意是洗牌、混洗的意思，把一组有规则的数据尽量�
 ## MapReduce Shuffle
 ### Map端的shuffle
 下图是MapReduce Shuffle的官方流程：
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20190528225053624.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjg0OTU3,size_16,color_FFFFFF,t_70)
+![Map端的Shuffle](/images/map_shuffle.png)
 因为频繁的磁盘I/O操作会严重的降低效率，因此“中间结果”不会立马写入磁盘，而是优先存储到map节点的“环形内存缓冲区”，在写入的过程中进行分区（partition），也就是对于每个键值对来说，都增加了一个partition属性值，然后连同键值对一起序列化成字节数组写入到缓冲区（缓冲区采用的就是字节数组，默认大小为100M）。
 当写入的数据量达到预先设置的阙值后便会启动溢写出线程将缓冲区中的那部分数据溢出写（spill）到磁盘的临时文件中，并在写入前根据key进行排序（sort）和合并（combine，可选操作）。
 溢出写过程按轮询方式将缓冲区中的内容写到mapreduce.cluster.local.dir属性指定的本地目录中。当整个map任务完成溢出写后，会对磁盘中这个map任务产生的所有临时文件（spill文件）进行归并（merge）操作生成最终的正式输出文件，此时的归并是将所有spill文件中的相同partition合并到一起，并对各个partition中的数据再进行一次排序（sort），生成key和对应的value-list，文件归并时，如果溢写文件数量超过参数min.num.spills.for.combine的值（默认为3）时，可以再次进行合并。
@@ -22,7 +22,7 @@ shuffle的本意是洗牌、混洗的意思，把一组有规则的数据尽量�
 ### Reduce端的shuffle
 当mapreduce任务提交后，reduce task就不断通过RPC从JobTracker那里获取map task是否完成的信息，如果获知某台TaskTracker上的map task执行完成，Shuffle的后半段过程就开始启动。Reduce端的shuffle主要包括三个阶段，copy、merge和reduce。
 每个reduce task负责处理一个分区的文件，以下是reduce task的处理流程：
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20190528224739384.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjg0OTU3,size_16,color_FFFFFF,t_70)
+![Reduce端的shuffle](/images/reduce_shuffle.jpg)
  - reduce task从每个map  task的结果文件中拉取对应分区的数据。因为数据在map阶段已经是分好区了，并且会有一个额外的索引文件记录每个分区的起始偏移量。所以reduce task取数的时候直接根据偏移量去拉取数据就ok。
  - reduce task从每个map task拉取分区数据的时候会进行再次合并，排序，按照自定义的reducer的逻辑代码去处理。
  - 最后就是Reduce过程了，在这个过程中产生了最终的输出结果，并将其写到HDFS上。
