@@ -3,9 +3,9 @@ title: MapReduce Shuffle 和 Spark Shuffle 详解
 date: 2018-05-30 22:52:15
 categories: Hadoop
 tags:
-- hadoop
-- spark
-- shuffle
+- Hadoop
+- Spark
+- Shuffle
 ---
 ## Shuffle简介
 shuffle的本意是洗牌、混洗的意思，把一组有规则的数据尽量打乱成无规则的数据。而在MapReduce中，Shuffle更像是洗牌的逆过程，指的是将map端的无规则输出按指定的规则“打乱”成具有一定规则的数据，以便reduce端接收处理。其在MapReduce中所处的工作阶段是map输出后到reduce接收前，具体可以分为map端和reduce端前后两个部分。
@@ -14,8 +14,7 @@ shuffle的本意是洗牌、混洗的意思，把一组有规则的数据尽量�
 ## MapReduce Shuffle
 ### Map端的shuffle
 下图是MapReduce Shuffle的官方流程：
-![Map端的Shuffle](/images/map_shuffle.jpg)
-
+![Map端的Shuffle](/images/map_shuffle.png)
 因为频繁的磁盘I/O操作会严重的降低效率，因此“中间结果”不会立马写入磁盘，而是优先存储到map节点的“环形内存缓冲区”，在写入的过程中进行分区（partition），也就是对于每个键值对来说，都增加了一个partition属性值，然后连同键值对一起序列化成字节数组写入到缓冲区（缓冲区采用的就是字节数组，默认大小为100M）。
 当写入的数据量达到预先设置的阙值后便会启动溢写出线程将缓冲区中的那部分数据溢出写（spill）到磁盘的临时文件中，并在写入前根据key进行排序（sort）和合并（combine，可选操作）。
 溢出写过程按轮询方式将缓冲区中的内容写到mapreduce.cluster.local.dir属性指定的本地目录中。当整个map任务完成溢出写后，会对磁盘中这个map任务产生的所有临时文件（spill文件）进行归并（merge）操作生成最终的正式输出文件，此时的归并是将所有spill文件中的相同partition合并到一起，并对各个partition中的数据再进行一次排序（sort），生成key和对应的value-list，文件归并时，如果溢写文件数量超过参数min.num.spills.for.combine的值（默认为3）时，可以再次进行合并。

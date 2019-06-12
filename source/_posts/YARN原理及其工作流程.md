@@ -4,7 +4,7 @@ date: 2018-06-08 14:24:58
 categories: YARN
 tags: 
 - YARN
-- Hadoop
+- hadoop
 ---
 ![YARN工作原理](/images/yarn.png)
 ### 一 YARN组成元素及其功能

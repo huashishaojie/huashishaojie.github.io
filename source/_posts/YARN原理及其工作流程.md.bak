@@ -2,11 +2,9 @@
 title: YARN工作原理及其工作流程
 date: 2018-06-08 14:24:58
 categories: YARN
-tags: 
-- YARN
-- Hadoop
+tags: [YARN,Hadoop]
 ---
-![YARN工作原理](images/yarn.png)
+![YARN工作原理](/images/yarn.png)
 ### 一 YARN组成元素及其功能
 RM:YARN的管理者
 NM:YARN的执行者
