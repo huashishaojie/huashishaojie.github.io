@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://huashishaojie.github.io/"/>
-  <updated>2019-06-11T12:44:15.308Z</updated>
+  <updated>2019-06-12T01:15:21.250Z</updated>
   <id>https://huashishaojie.github.io/</id>
   
   <author>
@@ -21,7 +21,7 @@
     <link href="https://huashishaojie.github.io/2018/06/08/YARN%E5%8E%9F%E7%90%86%E5%8F%8A%E5%85%B6%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B/"/>
     <id>https://huashishaojie.github.io/2018/06/08/YARN原理及其工作流程/</id>
     <published>2018-06-08T06:24:58.000Z</published>
-    <updated>2019-06-11T12:44:15.308Z</updated>
+    <updated>2019-06-12T01:15:21.250Z</updated>
     
     <content type="html"><![CDATA[<p><img src="/images/yarn.png" alt="YARN工作原理"></p><h3 id="一-YARN组成元素及其功能"><a href="#一-YARN组成元素及其功能" class="headerlink" title="一 YARN组成元素及其功能"></a>一 YARN组成元素及其功能</h3><p>RM:YARN的管理者<br>NM:YARN的执行者</p><h3 id="二-YARN工作原理"><a href="#二-YARN工作原理" class="headerlink" title="二 YARN工作原理"></a>二 YARN工作原理</h3><p>首先数据上传到集群中.然后将写好的程序打成架包通过命令提交MR作业.提交到集群后由集群管理者MR开始调度分配资源.到HDFS读取数据执行MapReduce相关进程对数据进行计算</p><h2 id="三-具体流程"><a href="#三-具体流程" class="headerlink" title="三 具体流程"></a>三 具体流程</h2><p>第一步: Client执行main()函数中runjob();开启作业</p><p>第二步:client向RM发送作业请求同时RM将作业id以及jar包存放路径返回给Client</p><p>第三步:Client会把Jar路径为前缀作业id为后缀作为唯一存放路径,将jar包写入到HDFS集群中,默认情况下jar包写10份,而其他数据只写3份 当改程序运行完后删除这些数据</p><p>第四步:Client再次将Jar存放地址(更为详细的描述)提交给RM.</p><p>第五步:RM将其放入调度器,向NM发送命令,NM开启MRAPPMaster进程,MR根据HDFS中jar包数据量为NM分配任务.</p><p>第六步:NM通过心跳机制接受调度器分配的任务</p><p>第七步:NM会开启内部YARNChild </p><p>第八步:YARNChild根据命令到HDFS检索作业资源,</p><p>第九步:YARNChild开启MapTask 或者Reduce Task</p><p>第十步:map计算YARNChild调度的数据.</p>]]></content>
     
